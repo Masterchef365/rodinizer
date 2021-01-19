@@ -7,6 +7,40 @@ const CONSONANTS: [char; 20] = [
     'Z',
 ];
 
+pub struct Rodinizer {
+    scratch: String,
+}
+
+impl Rodinizer {
+    pub fn new() -> Self {
+        Self {
+            scratch: String::with_capacity(50),
+        }
+    }
+
+    pub fn rodinize(&mut self, s: &str, rng: &mut impl Rng) -> Option<&str> {
+        let mut chars = s.chars();
+        let first_letter = chars.next()?;
+        self.scratch.clear();
+
+        if VOWELS.contains(&first_letter) {
+            self.scratch.push(*CONSONANTS.choose(rng).unwrap());
+            self.scratch.extend(first_letter.to_lowercase());
+        } else {
+            self.scratch.push(loop {
+                let &letter = CONSONANTS.choose(rng).unwrap();
+                if letter != first_letter {
+                    break letter;
+                }
+            });
+        }
+        self.scratch.extend(chars);
+
+        Some(self.scratch.as_str())
+    }
+}
+
+/*
 pub fn rodinize(s: &str, rng: &mut impl Rng) -> String {
     let mut chars = s.chars();
     let first_letter = chars.next().unwrap();
@@ -25,6 +59,7 @@ pub fn rodinize(s: &str, rng: &mut impl Rng) -> String {
     name.extend(chars);
     name
 }
+*/
 
 pub fn read_names(path: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let file = std::fs::read_to_string(path)?;
@@ -41,12 +76,14 @@ mod tests {
     #[test]
     fn test_rodinizer() {
         let mut rng = rand::thread_rng();
-        let s = rodinize("Charlie", &mut rng);
+        let mut rodinizer = Rodinizer::new();
+
+        let s = rodinizer.rodinize("Charlie", &mut rng).unwrap();
         let first_character = s.chars().next().unwrap();
         assert!(first_character != 'C');
         assert!(CONSONANTS.contains(&first_character));
 
-        let s = rodinize("Olivia", &mut rng);
+        let s = rodinizer.rodinize("Olivia", &mut rng).unwrap();
         let mut chars = s.chars();
         let first_character = chars.next().unwrap();
         let second_character = chars.next().unwrap();
