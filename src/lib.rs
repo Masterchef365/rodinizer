@@ -1,8 +1,11 @@
-use rand::Rng;
 use rand::seq::SliceRandom;
+use rand::Rng;
 
 const VOWELS: [char; 6] = ['A', 'E', 'I', 'O', 'U', 'Y'];
-const CONSONANTS: [char; 20] = ['B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Z'];
+const CONSONANTS: [char; 20] = [
+    'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X',
+    'Z',
+];
 
 pub fn rodinize(s: &str, rng: &mut impl Rng) -> String {
     let mut chars = s.chars();
@@ -23,3 +26,10 @@ pub fn rodinize(s: &str, rng: &mut impl Rng) -> String {
     name
 }
 
+pub fn read_names(path: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let file = std::fs::read_to_string(path)?;
+    Ok(file
+        .lines()
+        .map(|s| s.split(',').next().unwrap().to_string())
+        .collect())
+}
