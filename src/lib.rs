@@ -33,3 +33,25 @@ pub fn read_names(path: &str) -> Result<Vec<String>, Box<dyn std::error::Error>>
         .map(|s| s.split(',').next().unwrap().to_string())
         .collect())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rodinizer() {
+        let mut rng = rand::thread_rng();
+        let s = rodinize("Charlie", &mut rng);
+        let first_character = s.chars().next().unwrap();
+        assert!(first_character != 'C');
+        assert!(CONSONANTS.contains(&first_character));
+
+        let s = rodinize("Olivia", &mut rng);
+        let mut chars = s.chars();
+        let first_character = chars.next().unwrap();
+        let second_character = chars.next().unwrap();
+        assert!(CONSONANTS.contains(&first_character));
+        assert!(second_character.is_lowercase());
+        assert!(VOWELS.contains(&second_character.to_uppercase().next().unwrap()));
+    }
+}
